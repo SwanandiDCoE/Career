@@ -3,9 +3,26 @@
   "configurations": [
     {
       "name": "frontend",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000,
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev", "-p", "3003"],
+      "cwd": "careerpilot-ai/frontend",
+      "port": 3003,
+      "autoPort": false
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["src/server.js"],
+      "cwd": "careerpilot-ai/backend",
+      "port": 5001,
+      "autoPort": false
+    },
+    {
+      "name": "python-service",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["run.py"],
+      "cwd": "careerpilot-ai/python-service",
+      "port": 8001,
       "autoPort": false
     }
   ]

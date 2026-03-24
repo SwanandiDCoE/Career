@@ -2,6 +2,7 @@ const pdfParse = require('pdf-parse');
 const { openai, MODEL } = require('../config/openai');
 const { DUMMY_PROFILE }  = require('../utils/dummy');
 const prompts            = require('../utils/prompts');
+const { parseResume }    = require('../utils/resumeParser');
 const logger             = require('../utils/logger');
 
 const USE_AI = process.env.USE_AI === 'true';
@@ -32,8 +33,10 @@ exports.extractText = async (buffer) => {
  */
 exports.parseProfile = async (resumeText, targetRole) => {
   if (!USE_AI) {
-    logger.info('parseProfile → using dummy data (USE_AI=false)');
-    return { ...DUMMY_PROFILE, target_role: targetRole };
+    logger.info('parseProfile → regex parser (no API key needed)');
+    const profile = parseResume(resumeText, targetRole);
+    logger.info(`parseProfile → extracted ${profile.skills.length} skills, ${profile.experience_years} yrs exp`);
+    return profile;
   }
 
   logger.info('parseProfile → calling OpenAI');

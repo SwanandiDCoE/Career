@@ -1,6 +1,24 @@
 version: '3.9'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - '5435:5432'
+    environment:
+      POSTGRES_DB:       careerpilot
+      POSTGRES_USER:     careerpilot
+      POSTGRES_PASSWORD: careerpilot123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./python-service/app/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U careerpilot -d careerpilot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   frontend:
     build: ./frontend
     ports:
@@ -27,6 +45,12 @@ services:
     ports:
       - '8000:8000'
     env_file: ./python-service/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
 
 networks:
   default:

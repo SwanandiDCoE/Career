@@ -19,6 +19,13 @@ def create_app():
         "http://localhost:3000",
     ])
 
+    # ── DB schema init ───────────────────────────────────────────
+    try:
+        from app.db import init_db
+        init_db()
+    except Exception as e:
+        logging.warning(f"[app] DB not available at startup (will retry on first request): {e}")
+
     # ── Blueprints ────────────────────────────────────────────────
     from app.routes.jobs    import jobs_bp
     from app.routes.scrape  import scrape_bp
