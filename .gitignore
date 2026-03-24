@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.next/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Uploads (user files — never commit)
+backend/uploads/*.pdf
+
+# Build outputs
+dist/
+build/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
