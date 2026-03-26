@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Linkedin, Loader2, RefreshCw, Eye, Hash } from 'lucide-react';
 import toast from 'react-hot-toast';
 import CopyButton from '@/components/ui/CopyButton';
+import { generateLinkedInPost } from '@/lib/api';
 import type { ResumeProfile } from '@/types';
-import { DUMMY_LINKEDIN_POST } from '@/lib/dummy-data';
 
 interface Props {
   profile: ResumeProfile;
@@ -20,17 +20,15 @@ const TONES = [
 type Tone = typeof TONES[number]['id'];
 
 export default function LinkedInGenerator({ profile }: Props) {
-  const [tone, setTone] = useState<Tone>('authentic');
-  const [post, setPost] = useState<string | null>(null);
+  const [tone, setTone]   = useState<Tone>('authentic');
+  const [post, setPost]   = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      // In production: call /api/generate/linkedin-post
-      // const res = await axios.post('/api/generate/linkedin-post', { profile_summary, target_role, tone });
-      await new Promise((r) => setTimeout(r, 1600));
-      setPost(DUMMY_LINKEDIN_POST);
+      const result = await generateLinkedInPost(profile, tone);
+      setPost(typeof result === 'string' ? result : JSON.stringify(result));
       toast.success('LinkedIn post generated!');
     } catch {
       toast.error('Generation failed. Please try again.');
@@ -39,7 +37,7 @@ export default function LinkedInGenerator({ profile }: Props) {
     }
   };
 
-  const charCount = post?.length ?? 0;
+  const charCount    = post?.length ?? 0;
   const linkedInLimit = 3000;
 
   return (
@@ -128,7 +126,6 @@ export default function LinkedInGenerator({ profile }: Props) {
 
           {/* LinkedIn-style card preview */}
           <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
-            {/* Profile strip */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
                 {profile.name.charAt(0)}
@@ -138,12 +135,10 @@ export default function LinkedInGenerator({ profile }: Props) {
                 <p className="text-slate-500 text-xs">{profile.target_role} · 1st</p>
               </div>
             </div>
-            {/* Post body */}
             <pre className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap font-sans px-4 py-4">
               {post}
             </pre>
-            {/* Engagement mock */}
-            <div className="flex items-center gap-4 px-4 py-3 border-t border-slate-700 text-slate-500 text-xs">
+            <div className="flex items-center flex-wrap gap-2 sm:gap-4 px-4 py-3 border-t border-slate-700 text-slate-500 text-xs">
               <span>👍 Like</span>
               <span>💬 Comment</span>
               <span>↩️ Repost</span>
@@ -151,7 +146,6 @@ export default function LinkedInGenerator({ profile }: Props) {
             </div>
           </div>
 
-          {/* Hashtag tip */}
           <div className="mt-3 flex items-start gap-2 text-slate-500 text-xs">
             <Hash className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             <span>

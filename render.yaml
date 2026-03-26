@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: careerpilot-python
+    runtime: python
+    rootDir: python-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app --workers 2 --bind 0.0.0.0:$PORT --timeout 120
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: careerpilot-db
+          property: connectionString
+      - key: ALLOWED_ORIGIN
+        sync: false   # set this in Render dashboard to your Netlify URL
+
+databases:
+  - name: careerpilot-db
+    plan: free
+    databaseName: careerpilot
+    user: careerpilot

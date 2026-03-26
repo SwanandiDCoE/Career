@@ -3,7 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: "CareerPilot AI — Find Jobs You'll Actually Get",
+  title: "Hirenext — Find Jobs You'll Actually Get",
   description:
     'Upload your resume and get AI-ranked job matches, resume feedback, cold emails, and LinkedIn posts — in 30 seconds.',
   keywords: ['job search', 'AI resume', 'job matching', 'career'],

@@ -91,7 +91,7 @@ export default function ResumeUpload({ onResult, onLoadingChange, hasResult }: P
           <div className="flex items-center justify-center gap-2">
             <FileCheck2 className="w-5 h-5 text-emerald-400 shrink-0" />
             <div className="text-left">
-              <p className="text-emerald-300 text-sm font-semibold truncate max-w-[160px]">{file.name}</p>
+              <p className="text-emerald-300 text-sm font-semibold truncate max-w-[120px] sm:max-w-[200px]">{file.name}</p>
               <p className="text-slate-500 text-xs">{(file.size / 1024).toFixed(0)} KB</p>
             </div>
             <button

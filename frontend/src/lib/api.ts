@@ -1,9 +1,9 @@
 import axios from 'axios';
-import type { AnalysisResult, JobMatch } from '@/types';
+import type { AnalysisResult, JobMatch, ResumeProfile, ApplyStrategy } from '@/types';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000',
-  timeout: 90000,   // 90s — real PDF parse + DB query + scoring takes ~5–15s
+  timeout: 90000,   // 90s — real PDF parse + DB query + AI scoring takes ~5–15s
 });
 
 // Unwrap backend envelope: { success: true, data: {...} } → data
@@ -28,20 +28,51 @@ export async function uploadResume(
   return unwrap<AnalysisResult>(res);
 }
 
-// Fetch resume feedback for an already-parsed profile
-export async function getResumeFeedback(resumeText: string) {
-  const res = await api.post('/api/feedback', { resume_text: resumeText });
-  return res.data;
+// Generate apply strategy for a specific job using the resume text
+export async function generateStrategy(
+  resumeText: string,
+  job: Pick<JobMatch, 'title' | 'company' | 'location' | 'job_url'> & { description?: string }
+): Promise<ApplyStrategy> {
+  const res = await api.post('/api/strategy', { resume_text: resumeText, job });
+  return unwrap<ApplyStrategy>(res);
 }
 
 // Generate cold email for a specific job match
-export async function generateColdEmail(match: JobMatch, profileSummary: string) {
-  const res = await api.post('/api/generate/cold-email', { match, profile_summary: profileSummary });
-  return res.data;
+export async function generateColdEmail(
+  match: JobMatch,
+  profileSummary: string
+): Promise<string> {
+  const res = await api.post('/api/email', {
+    job: {
+      title:    match.title,
+      company:  match.company,
+      location: match.location,
+    },
+    matched_skills:  match.matched_skills,
+    profile_summary: profileSummary,
+  });
+  return unwrap<any>(res)?.email ?? res.data;
 }
 
 // Generate LinkedIn post
-export async function generateLinkedInPost(profileSummary: string, targetRole: string) {
-  const res = await api.post('/api/generate/linkedin-post', { profile_summary: profileSummary, target_role: targetRole });
+export async function generateLinkedInPost(
+  profile: ResumeProfile,
+  tone: 'professional' | 'authentic' | 'bold' = 'authentic'
+): Promise<string> {
+  const res = await api.post('/api/linkedin', {
+    profile: {
+      name:             profile.name,
+      target_role:      profile.target_role,
+      skills:           profile.skills,
+      experience_years: profile.experience_years,
+    },
+    tone,
+  });
+  return unwrap<any>(res)?.post ?? res.data;
+}
+
+// Fetch resume feedback for an already-parsed profile
+export async function getResumeFeedback(resumeText: string) {
+  const res = await api.post('/api/feedback', { resume_text: resumeText });
   return res.data;
 }

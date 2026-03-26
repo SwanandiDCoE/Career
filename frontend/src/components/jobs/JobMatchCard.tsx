@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import type { JobMatch } from '@/types';
-import { cn, getScoreColor, getScoreBg } from '@/lib/utils';
+import { cn, getScoreColor } from '@/lib/utils';
 
 interface Props {
   match: JobMatch;
@@ -13,7 +13,7 @@ export default function JobMatchCard({ match }: Props) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className={cn('card border transition-all', getScoreBg(match.match_score))}>
+    <div className={cn('card border transition-all')}>
       <div className="flex items-start justify-between gap-4">
         {/* Left: Job Info */}
         <div className="flex-1">

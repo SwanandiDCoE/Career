@@ -56,7 +56,7 @@ exports.handleUpload = async (req, res, next) => {
     // ── Cleanup uploaded file ─────────────────────────────────
     _cleanupFile(filePath);
 
-    return response.ok(res, { profile, matches, feedback }, 'Resume analysis complete');
+    return response.ok(res, { profile, matches, feedback, resume_text: resumeText }, 'Resume analysis complete');
   } catch (err) {
     _cleanupFile(filePath);
     next(err);

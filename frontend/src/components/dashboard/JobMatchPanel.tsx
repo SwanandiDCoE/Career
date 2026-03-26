@@ -130,9 +130,9 @@ function JobCard({ match, index, isExpanded, onToggle }: {
       }}>
 
       {/* ── Card Header ─────────────────────────────────────── */}
-      <div className="flex items-start gap-4 p-5 cursor-pointer select-none" onClick={onToggle}>
+      <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 cursor-pointer select-none" onClick={onToggle}>
         {/* Score Ring */}
-        <ScoreRing score={match.match_score} size={76} strokeWidth={5} />
+        <ScoreRing score={match.match_score} size={60} strokeWidth={4} />
 
         {/* Info */}
         <div className="flex-1 min-w-0">
@@ -224,7 +224,7 @@ function JobCard({ match, index, isExpanded, onToggle }: {
               </div>
 
               {/* CTA */}
-              <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                     Rank #{index + 1} · via {match.source || 'job board'}
@@ -244,11 +244,11 @@ function JobCard({ match, index, isExpanded, onToggle }: {
                     onClick={(e) => e.stopPropagation()}
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
-                    className="btn-primary text-sm py-2 px-5">
+                    className="btn-primary text-sm py-2 px-5 justify-center sm:justify-start">
                     Apply Now <ExternalLink className="w-3.5 h-3.5" />
                   </motion.a>
                 ) : (
-                  <span className="text-xs px-4 py-2 rounded-xl opacity-40"
+                  <span className="text-xs px-4 py-2 rounded-xl opacity-40 text-center sm:text-left"
                     style={{ background: 'var(--surface-3)', color: 'var(--text-muted)' }}>
                     Link unavailable
                   </span>

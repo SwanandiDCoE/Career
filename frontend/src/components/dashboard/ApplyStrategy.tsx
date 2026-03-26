@@ -10,14 +10,17 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ScoreRing from '@/components/ui/ScoreRing';
-import { DUMMY_STRATEGY } from '@/lib/dummy-data';
+import { generateStrategy } from '@/lib/api';
 import type {
   JobMatch, ApplyStrategy as ApplyStrategyType,
   ImprovementAction, MissingSkill, InterviewTip,
   ApplicationPriority,
 } from '@/types';
 
-interface Props { matches: JobMatch[] }
+interface Props {
+  matches:    JobMatch[];
+  resumeText: string;
+}
 
 /* ── Config maps ──────────────────────────────────────────────── */
 const PRIORITY = {
@@ -71,7 +74,7 @@ const item = {
 
 /* ═══════════════════════════════════════════════════════════════ */
 
-export default function ApplyStrategy({ matches }: Props) {
+export default function ApplyStrategy({ matches, resumeText }: Props) {
   const [selected, setSelected]   = useState<JobMatch>(matches[0]);
   const [strategy, setStrategy]   = useState<ApplyStrategyType | null>(null);
   const [loading, setLoading]     = useState(false);
@@ -81,12 +84,13 @@ export default function ApplyStrategy({ matches }: Props) {
     setLoading(true);
     setStrategy(null);
     try {
-      await new Promise(r => setTimeout(r, 2000));
-      setStrategy({
-        ...DUMMY_STRATEGY,
-        match_score:   selected.match_score,
-        match_summary: `Your profile is a ${selected.match_score >= 80 ? 'strong' : 'partial'} fit for ${selected.title} at ${selected.company}. ${DUMMY_STRATEGY.match_summary.split('.').slice(1).join('.').trim()}`,
+      const result = await generateStrategy(resumeText, {
+        title:       selected.title,
+        company:     selected.company,
+        location:    selected.location,
+        job_url:     selected.job_url,
       });
+      setStrategy(result);
       toast.success('Strategy ready!');
     } catch {
       toast.error('Generation failed — try again.');
@@ -162,8 +166,8 @@ export default function ApplyStrategy({ matches }: Props) {
         {loading
           ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating strategy...</>
           : strategy
-            ? <><Sparkles className="w-4 h-4" /> Regenerate for {selected.company}</>
-            : <><Zap className="w-4 h-4" /> Generate Strategy for {selected.company}</>
+            ? <><Sparkles className="w-4 h-4" /> Regenerate<span className="hidden sm:inline"> for {selected.company}</span></>
+            : <><Zap className="w-4 h-4" /> Generate Strategy<span className="hidden sm:inline"> for {selected.company}</span></>
         }
       </motion.button>
 
@@ -203,9 +207,9 @@ export default function ApplyStrategy({ matches }: Props) {
             <motion.div variants={item}
               className="rounded-2xl p-5 flex flex-col gap-4"
               style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
-              <div className="flex items-center gap-5">
-                <ScoreRing score={strategy.match_score} size={88} strokeWidth={6} />
-                <div>
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5">
+                <ScoreRing score={strategy.match_score} size={80} strokeWidth={5} />
+                <div className="text-center sm:text-left">
                   <p className="section-label">Match Analysis</p>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                     {strategy.match_summary}
@@ -295,11 +299,12 @@ export default function ApplyStrategy({ matches }: Props) {
             <motion.div variants={item}
               className="rounded-2xl p-5"
               style={{ background: 'rgba(139,92,246,0.05)', border: '1px solid rgba(139,92,246,0.15)' }}>
-              <h3 className="text-sm font-semibold flex items-center gap-2 mb-4" style={{ color: '#c084fc' }}>
-                <MessageSquare className="w-4 h-4" />
-                Interview Prep
-                <span className="text-xs font-normal ml-1" style={{ color: 'var(--text-muted)' }}>
-                  — likely questions for {selected.company}
+              <h3 className="text-sm font-semibold flex items-start gap-2 mb-4" style={{ color: '#c084fc' }}>
+                <MessageSquare className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>Interview Prep
+                  <span className="text-xs font-normal ml-1" style={{ color: 'var(--text-muted)' }}>
+                    — {selected.company}
+                  </span>
                 </span>
               </h3>
               <div className="flex flex-col gap-2.5">

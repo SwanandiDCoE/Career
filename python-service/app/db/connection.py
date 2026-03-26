@@ -20,9 +20,9 @@ def _get_dsn() -> str:
     return (
         f"host={os.getenv('DB_HOST', '127.0.0.1')} "
         f"port={os.getenv('DB_PORT', '5435')} "
-        f"dbname={os.getenv('DB_NAME', 'careerpilot')} "
-        f"user={os.getenv('DB_USER', 'careerpilot')} "
-        f"password={os.getenv('DB_PASSWORD', 'careerpilot123')}"
+        f"dbname={os.getenv('DB_NAME', 'hirenext')} "
+        f"user={os.getenv('DB_USER', 'hirenext')} "
+        f"password={os.getenv('DB_PASSWORD', 'hirenext123')}"
     )
 
 

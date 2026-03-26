@@ -26,7 +26,8 @@ INSERT INTO jobs (
     skills, requirements,
     experience_min, experience_max,
     is_remote, work_mode,
-    company_size, company_stage, company_domain
+    company_size, company_stage, company_domain,
+    trust_score
 )
 VALUES (
     %(title)s, %(company)s, %(location)s, %(job_url)s, %(description)s, %(date_posted)s,
@@ -35,7 +36,8 @@ VALUES (
     %(skills)s::jsonb, %(requirements)s::jsonb,
     %(experience_min)s, %(experience_max)s,
     %(is_remote)s, %(work_mode)s,
-    %(company_size)s, %(company_stage)s, %(company_domain)s
+    %(company_size)s, %(company_stage)s, %(company_domain)s,
+    %(trust_score)s
 )
 ON CONFLICT (job_url) DO UPDATE SET
     title          = EXCLUDED.title,
@@ -52,6 +54,7 @@ ON CONFLICT (job_url) DO UPDATE SET
     company_size   = EXCLUDED.company_size,
     company_stage  = EXCLUDED.company_stage,
     company_domain = EXCLUDED.company_domain,
+    trust_score    = EXCLUDED.trust_score,
     scraped_at     = NOW()
 RETURNING id;
 """
@@ -82,6 +85,7 @@ def _prep(job: dict) -> dict:
         "company_size":    job.get("company_size", "unknown"),
         "company_stage":   job.get("company_stage", "unknown"),
         "company_domain":  job.get("company_domain", "tech"),
+        "trust_score":     job.get("trust_score", 0),
     }
 
 
@@ -172,13 +176,26 @@ def search_jobs(filters: dict) -> list[dict]:
         params["keywords"] = filters["keywords"]
 
     # ── location ────────────────────────────────────────────────
-    # JobSpy returns state codes like "KA, IN" for Bangalore/Karnataka.
-    # Map common city names → their state codes so filters still work.
+    # JobSpy returns state/region codes like "KA, IN" or "CA, US".
+    # Map common city names → their codes so filters still work.
     _CITY_TO_STATE = {
+        # India
         "bangalore": "ka", "bengaluru": "ka",
         "hyderabad": "tg", "mumbai": "mh", "pune": "mh",
         "delhi": "dl", "chennai": "tn", "kolkata": "wb",
-        "gurgaon": "hr", "noida": "up", "ahmedabad": "gj",
+        "gurgaon": "hr", "gurugram": "hr", "noida": "up", "ahmedabad": "gj",
+        # USA
+        "san francisco": "ca", "los angeles": "ca", "san jose": "ca",
+        "new york": "ny", "new york city": "ny", "nyc": "ny",
+        "seattle": "wa", "boston": "ma", "austin": "tx",
+        "chicago": "il", "denver": "co", "atlanta": "ga",
+        # UK / Europe
+        "london": "uk", "manchester": "uk",
+        "berlin": "germany", "amsterdam": "netherlands", "paris": "france",
+        # Asia-Pacific
+        "singapore": "singapore",
+        "sydney": "australia", "melbourne": "australia",
+        "toronto": "canada", "vancouver": "canada",
     }
     if filters.get("location"):
         loc_lower = filters["location"].lower().strip()
@@ -230,6 +247,11 @@ def search_jobs(filters: dict) -> list[dict]:
         conditions.append("source = %(source)s")
         params["source"] = filters["source"]
 
+    # ── trust_score floor ─────────────────────────────────────
+    if filters.get("min_trust") is not None:
+        conditions.append("trust_score >= %(min_trust)s")
+        params["min_trust"] = int(filters["min_trust"])
+
     limit  = int(filters.get("limit",  50))
     offset = int(filters.get("offset", 0))
 
@@ -242,7 +264,7 @@ def search_jobs(filters: dict) -> list[dict]:
             skills, requirements,
             experience_min, experience_max,
             company_size, company_stage, company_domain,
-            scraped_at
+            trust_score, scraped_at
         FROM jobs
         WHERE {where}
         ORDER BY scraped_at DESC, salary_max DESC NULLS LAST
@@ -266,6 +288,119 @@ def search_jobs(filters: dict) -> list[dict]:
                 d["id"]           = str(d["id"])
                 result.append(d)
             return result
+    finally:
+        release_conn(conn)
+
+
+# ─────────────────────────────────────────────────────────────────
+# QUALITY JOBS
+# ─────────────────────────────────────────────────────────────────
+
+def get_quality_jobs(min_trust: int = 70, limit: int = 500, offset: int = 0) -> list[dict]:
+    """
+    Return jobs with trust_score >= min_trust in clean output schema.
+    Ordered by trust_score DESC, then scraped_at DESC.
+    """
+    conn = get_conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT
+                    id, title, company, location, job_url, date_posted,
+                    source, work_mode, is_remote,
+                    salary_min, salary_max, salary_currency, salary_period, salary_raw,
+                    skills, experience_min, experience_max, trust_score
+                FROM jobs
+                WHERE is_active = TRUE
+                  AND trust_score >= %s
+                ORDER BY trust_score DESC, scraped_at DESC
+                LIMIT %s OFFSET %s
+            """, (min_trust, limit, offset))
+            rows = cur.fetchall()
+            result = []
+            for row in rows:
+                d = dict(row)
+                d["id"]     = str(d["id"])
+                d["skills"] = d["skills"] if isinstance(d["skills"], list) else []
+                result.append(d)
+            return result
+    finally:
+        release_conn(conn)
+
+
+def backfill_trust_scores() -> dict:
+    """
+    Compute and update trust_score for all active jobs.
+    Also deactivates jobs that fail validation.
+    Safe to run multiple times.
+    """
+    from app.utils.quality import compute_trust_score, validate
+
+    conn = get_conn()
+    updated = skipped = deactivated = 0
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT id, title, company, job_url, description, source,
+                       salary_raw, salary_min, salary_max, date_posted, skills
+                FROM jobs WHERE is_active = TRUE
+            """)
+            rows = cur.fetchall()
+
+        with conn.cursor() as cur:
+            for row in rows:
+                job = dict(row)
+                job["skills"] = job["skills"] if isinstance(job["skills"], list) else []
+
+                is_valid, _ = validate(job)
+                if not is_valid:
+                    cur.execute(
+                        "UPDATE jobs SET is_active = FALSE WHERE id = %s",
+                        (job["id"],)
+                    )
+                    deactivated += 1
+                    continue
+
+                score = compute_trust_score(job)
+                cur.execute(
+                    "UPDATE jobs SET trust_score = %s WHERE id = %s",
+                    (score, job["id"])
+                )
+                updated += 1
+
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        release_conn(conn)
+
+    return {"updated": updated, "deactivated": deactivated, "skipped": skipped}
+
+
+# ─────────────────────────────────────────────────────────────────
+# IDF SUPPORT
+# ─────────────────────────────────────────────────────────────────
+
+def get_skills_for_idf() -> tuple[int, dict[str, int]]:
+    """
+    Return (total_active_jobs, {skill: job_count}) for IDF computation.
+    Lightweight — only fetches the skills column.
+    """
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM jobs WHERE is_active = TRUE")
+            total = cur.fetchone()[0]
+            cur.execute(
+                "SELECT skills FROM jobs WHERE is_active = TRUE AND skills IS NOT NULL"
+            )
+            skill_counts: dict[str, int] = {}
+            for (skills,) in cur.fetchall():
+                if isinstance(skills, list):
+                    for s in set(s.lower() for s in skills):
+                        skill_counts[s] = skill_counts.get(s, 0) + 1
+            return total, skill_counts
     finally:
         release_conn(conn)
 

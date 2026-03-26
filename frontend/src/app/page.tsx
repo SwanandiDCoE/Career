@@ -45,7 +45,7 @@ const STATS = [
 ];
 
 const TESTIMONIALS = [
-  { name: 'Priya S.',  role: 'SDE Fresher',      quote: 'Got 3 interview calls in a week. CareerPilot told me exactly which jobs to apply to and what to fix first.' },
+  { name: 'Priya S.',  role: 'SDE Fresher',      quote: 'Got 3 interview calls in a week. Hirenext told me exactly which jobs to apply to and what to fix first.' },
   { name: 'Arjun M.',  role: 'Career Switcher',   quote: 'The skill gap feature showed me I was missing Jest. I learned it in 4 days and got shortlisted at Swiggy.' },
   { name: 'Sneha R.',  role: 'MBA Graduate',      quote: 'The cold email generator is wild. Hiring managers at 3 companies actually replied to me.' },
 ];
@@ -71,7 +71,7 @@ export default function LandingPage() {
                 style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.4)' }}>
                 <Zap className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold text-white text-[15px] tracking-[-0.01em]">CareerPilot AI</span>
+              <span className="font-bold text-white text-[15px] tracking-[-0.01em]">Hirenext</span>
             </div>
 
             {/* Nav links */}
@@ -93,7 +93,7 @@ export default function LandingPage() {
       </motion.nav>
 
       {/* ── Hero ────────────────────────────────────────────── */}
-      <section className="hero-gradient noise relative pt-36 pb-28 px-6">
+      <section className="hero-gradient noise relative pt-28 sm:pt-36 pb-20 sm:pb-28 px-4 sm:px-6">
         {/* Ambient orbs */}
         <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(ellipse, rgba(99,102,241,0.12) 0%, transparent 70%)', filter: 'blur(40px)' }} />
@@ -110,7 +110,7 @@ export default function LandingPage() {
 
           {/* Headline */}
           <motion.h1 variants={fadeUp}
-            className="text-[3.5rem] md:text-[5rem] font-black leading-[1.02] tracking-[-0.035em] text-balance mb-6">
+            className="text-[2.6rem] sm:text-[3.5rem] md:text-[5rem] font-black leading-[1.05] sm:leading-[1.02] tracking-[-0.025em] sm:tracking-[-0.035em] text-balance mb-6">
             <span className="text-white">Find jobs you </span>
             <span className="gradient-text">actually have</span>
             <br />
@@ -119,20 +119,20 @@ export default function LandingPage() {
 
           {/* Subheadline */}
           <motion.p variants={fadeUp}
-            className="text-[1.1rem] leading-relaxed max-w-2xl mx-auto mb-10 text-balance"
+            className="text-sm sm:text-[1.1rem] leading-relaxed max-w-2xl mx-auto mb-10 text-balance px-2 sm:px-0"
             style={{ color: 'var(--text-secondary)' }}>
             Upload your resume. Get AI-ranked job matches with match scores, skill gaps,
             targeted cold emails, and an apply strategy — in under 30 seconds.
           </motion.p>
 
           {/* CTAs */}
-          <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 px-4 sm:px-0">
             <Link href="/dashboard"
-              className="btn-primary text-[15px] px-7 py-3.5 rounded-xl glow-indigo">
+              className="btn-primary text-[15px] px-7 py-3.5 rounded-xl glow-indigo w-full sm:w-auto justify-center">
               Analyse My Resume Free
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <a href="#how-it-works" className="btn-secondary text-[15px] px-7 py-3.5 rounded-xl">
+            <a href="#how-it-works" className="btn-secondary text-[15px] px-7 py-3.5 rounded-xl w-full sm:w-auto justify-center">
               See How It Works
             </a>
           </motion.div>
@@ -169,7 +169,7 @@ export default function LandingPage() {
               </div>
               <div className="flex-1 mx-3 h-5 rounded-md flex items-center px-3 text-[11px]"
                 style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)' }}>
-                careerpilot.ai/dashboard
+                hirenext.ai/dashboard
               </div>
             </div>
 
@@ -243,7 +243,7 @@ export default function LandingPage() {
             className="text-center mb-16">
             <motion.p variants={fadeUp} className="section-label">Features</motion.p>
             <motion.h2 variants={fadeUp}
-              className="text-4xl md:text-5xl font-black text-white tracking-tight text-balance">
+              className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight text-balance">
               Everything you need to land the job
             </motion.h2>
             <motion.p variants={fadeUp} className="mt-4 text-lg max-w-xl mx-auto text-balance"
@@ -279,7 +279,7 @@ export default function LandingPage() {
             className="text-center mb-16">
             <motion.p variants={fadeUp} className="section-label">How It Works</motion.p>
             <motion.h2 variants={fadeUp}
-              className="text-4xl md:text-5xl font-black text-white tracking-tight">
+              className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">
               Three steps to your next offer
             </motion.h2>
           </motion.div>
@@ -323,7 +323,7 @@ export default function LandingPage() {
             className="text-center mb-14">
             <motion.p variants={fadeUp} className="section-label">Reviews</motion.p>
             <motion.h2 variants={fadeUp}
-              className="text-4xl md:text-5xl font-black text-white tracking-tight">
+              className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">
               People are getting hired
             </motion.h2>
           </motion.div>
@@ -363,7 +363,7 @@ export default function LandingPage() {
       <section className="py-24 px-6">
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           transition={{ duration: 0.6, ease: [0.16,1,0.3,1] }}
-          className="max-w-3xl mx-auto text-center rounded-3xl py-16 px-8 relative overflow-hidden"
+          className="max-w-3xl mx-auto text-center rounded-3xl py-12 sm:py-16 px-5 sm:px-8 relative overflow-hidden"
           style={{
             background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.08) 100%)',
             border: '1px solid rgba(99,102,241,0.2)',
@@ -377,13 +377,13 @@ export default function LandingPage() {
               style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', boxShadow: '0 0 30px rgba(99,102,241,0.4)' }}>
               <Rocket className="w-7 h-7 text-white" />
             </div>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">
               Your AI recruiter is waiting.
             </h2>
-            <p className="text-lg mb-8" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-base sm:text-lg mb-8" style={{ color: 'var(--text-secondary)' }}>
               Stop applying blindly. Start applying smart.
             </p>
-            <Link href="/dashboard" className="btn-primary text-[15px] px-8 py-3.5 rounded-xl">
+            <Link href="/dashboard" className="btn-primary text-[15px] px-8 py-3.5 rounded-xl w-full sm:w-auto justify-center">
               Analyse My Resume Free <ArrowRight className="w-4 h-4" />
             </Link>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-8 text-sm"
@@ -407,9 +407,9 @@ export default function LandingPage() {
               style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}>
               <Zap className="w-3 h-3 text-white" />
             </div>
-            <span className="font-semibold" style={{ color: 'var(--text-secondary)' }}>CareerPilot AI</span>
+            <span className="font-semibold" style={{ color: 'var(--text-secondary)' }}>Hirenext</span>
           </div>
-          <p>© 2025 CareerPilot AI · Built for job seekers.</p>
+          <p>© 2025 Hirenext · Built for job seekers.</p>
         </div>
       </footer>
     </div>

@@ -30,4 +30,4 @@ services:
 
 networks:
   default:
-    name: careerpilot-network
+    name: hirenext-network

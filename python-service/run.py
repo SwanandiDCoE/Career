@@ -1,4 +1,4 @@
-"""Entry point for the CareerPilot AI Python microservice."""
+"""Entry point for the Hirenext Python microservice."""
 import os
 from dotenv import load_dotenv
 from app import create_app
@@ -10,5 +10,5 @@ app = create_app()
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 8000))
     debug = os.getenv('FLASK_ENV') == 'development'
-    print(f'[CareerPilot] Python service running on http://localhost:{port}')
+    print(f'[Hirenext] Python service running on http://localhost:{port}')
     app.run(host='0.0.0.0', port=port, debug=debug)

@@ -15,7 +15,7 @@ export default function UploadPage() {
     try {
       const data = await uploadResume(file, jobTitle, location);
       // Store result in sessionStorage for dashboard
-      sessionStorage.setItem('careerpilot_result', JSON.stringify(data));
+      sessionStorage.setItem('hirenext_result', JSON.stringify(data));
       router.push('/dashboard');
     } catch (err) {
       toast.error('Upload failed. Please try again.');

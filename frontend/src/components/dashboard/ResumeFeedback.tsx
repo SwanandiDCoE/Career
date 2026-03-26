@@ -26,21 +26,23 @@ export default function ResumeFeedback({ feedback }: Props) {
   return (
     <div className="flex flex-col gap-5">
       {/* Overall Score Banner */}
-      <div className="card bg-gradient-to-br from-slate-900 to-slate-900/60 border-slate-700/60 flex items-center gap-6">
-        <ScoreRing score={feedback.overall_score} size={96} />
-        <div>
-          <p className="text-slate-400 text-sm mb-1">Resume Score</p>
-          <h3 className="text-white text-2xl font-black">{scoreLabel}</h3>
-          <p className="text-slate-400 text-sm mt-1">{scoreSub}</p>
+      <div className="card bg-gradient-to-br from-slate-900 to-slate-900/60 border-slate-700/60 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <ScoreRing score={feedback.overall_score} size={80} />
+          <div className="flex-1 sm:flex-none">
+            <p className="text-slate-400 text-sm mb-1">Resume Score</p>
+            <h3 className="text-white text-2xl font-black">{scoreLabel}</h3>
+            <p className="text-slate-400 text-sm mt-1">{scoreSub}</p>
+          </div>
         </div>
 
         {/* Score breakdown bars */}
-        <div className="ml-auto hidden md:flex flex-col gap-2 min-w-[160px]">
+        <div className="w-full sm:ml-auto sm:min-w-[160px] flex flex-col gap-2">
           {[
-            { label: 'Clarity',     val: Math.min(100, feedback.overall_score + 8)  },
-            { label: 'Impact',      val: Math.max(0,   feedback.overall_score - 12) },
-            { label: 'ATS Ready',   val: Math.max(0,   feedback.overall_score - 5)  },
-            { label: 'Keywords',    val: Math.min(100, feedback.overall_score + 4)  },
+            { label: 'Clarity',   val: Math.min(100, feedback.overall_score + 8)  },
+            { label: 'Impact',    val: Math.max(0,   feedback.overall_score - 12) },
+            { label: 'ATS Ready', val: Math.max(0,   feedback.overall_score - 5)  },
+            { label: 'Keywords',  val: Math.min(100, feedback.overall_score + 4)  },
           ].map((item) => (
             <div key={item.label}>
               <div className="flex justify-between text-xs text-slate-500 mb-0.5">
@@ -59,7 +61,7 @@ export default function ResumeFeedback({ feedback }: Props) {
       </div>
 
       {/* Three columns of feedback */}
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
         {/* Strengths */}
         <FeedbackSection
           title="Strengths"

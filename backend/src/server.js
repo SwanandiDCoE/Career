@@ -42,7 +42,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/health', (req, res) => {
   res.json({
     status:    'ok',
-    service:   'careerpilot-backend',
+    service:   'hirenext-backend',
     version:   '1.0.0',
     timestamp: new Date().toISOString(),
     mode:      process.env.NODE_ENV || 'development',
@@ -67,7 +67,7 @@ app.use(errorHandler);
 
 // ── Start Server ─────────────────────────────────────────────────
 app.listen(PORT, () => {
-  logger.info(`CareerPilot backend  →  http://localhost:${PORT}`);
+  logger.info(`Hirenext backend  →  http://localhost:${PORT}`);
   logger.info(`AI mode              →  ${process.env.USE_AI === 'true' ? 'OpenAI (live)' : 'Dummy data'}`);
   logger.info(`Jobs mode            →  ${process.env.USE_LIVE_JOBS === 'true' ? 'JobSpy (live)' : 'Dummy data'}`);
 });

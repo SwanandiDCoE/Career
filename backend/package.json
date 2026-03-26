@@ -1,7 +1,7 @@
 {
-  "name": "careerpilot-ai-backend",
+  "name": "hirenext-backend",
   "version": "1.0.0",
-  "description": "CareerPilot AI — Node.js/Express backend",
+  "description": "Hirenext — Node.js/Express backend",
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",

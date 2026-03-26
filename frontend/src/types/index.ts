@@ -33,9 +33,10 @@ export interface ResumeFeedback {
 }
 
 export interface AnalysisResult {
-  profile: ResumeProfile;
-  matches: JobMatch[];
-  feedback: ResumeFeedback;
+  profile:     ResumeProfile;
+  matches:     JobMatch[];
+  feedback:    ResumeFeedback;
+  resume_text: string;   // raw extracted text — used for strategy/email generation
 }
 
 // ── Apply Strategy Engine ─────────────────────────────────────────

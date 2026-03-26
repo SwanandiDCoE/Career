@@ -1,5 +1,5 @@
 -- ================================================================
--- CareerPilot AI  –  PostgreSQL Schema
+-- Hirenext  –  PostgreSQL Schema
 -- ================================================================
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";   -- for gen_random_uuid()
@@ -37,6 +37,9 @@ CREATE TABLE IF NOT EXISTS jobs (
     company_size    TEXT,           -- startup / mid-size / enterprise / unknown
     company_stage   TEXT,           -- Series A / B / public / unknown
     company_domain  TEXT,           -- fintech / healthtech / edtech / SaaS etc.
+
+    -- Quality
+    trust_score     INT         DEFAULT 0,   -- 0–100 computed by quality.py
 
     -- Meta
     scraped_at      TIMESTAMPTZ DEFAULT NOW(),

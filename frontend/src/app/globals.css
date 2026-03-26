@@ -267,6 +267,13 @@
 }
 .spin-slow { animation: spinSlow 8s linear infinite; }
 
+/* Hide scrollbar while keeping scroll functionality */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
 /* Score ring draw */
 @keyframes ringDraw {
   from { stroke-dashoffset: var(--ring-full); }

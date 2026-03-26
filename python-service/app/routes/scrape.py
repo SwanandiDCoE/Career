@@ -6,7 +6,10 @@ GET  /stats    — DB stats (total jobs, coverage, breakdown)
 """
 
 from flask import Blueprint, request, jsonify
-from app.services.pipeline import run_pipeline, TECH_SEARCH_TERMS
+from app.services.pipeline import (
+    run_pipeline, TECH_SEARCH_TERMS,
+    NAUKRI_SEARCH_TERMS, YC_SEARCH_TERMS,
+)
 from app.db.jobs_repo import get_stats
 
 scrape_bp = Blueprint("scrape", __name__)
@@ -17,11 +20,12 @@ def scrape():
     """
     Body (all optional):
       {
-        "search_terms": ["python developer", "react developer"],
-        "locations":    ["Bangalore", "Remote"],
+        "search_terms":      ["python developer", "react developer"],
+        "locations":         ["Bangalore", "Remote"],
         "results_per_query": 15,
-        "sources": ["indeed", "glassdoor"]
+        "sources":           ["indeed", "glassdoor", "naukri", "yc"]
       }
+    Omit "sources" to run all four scrapers.
     """
     body = request.get_json(silent=True) or {}
 
@@ -48,5 +52,12 @@ def stats():
 
 @scrape_bp.get("/search-terms")
 def search_terms():
-    """Return the list of built-in tech search terms."""
-    return jsonify({"ok": True, "data": TECH_SEARCH_TERMS}), 200
+    """Return all built-in search term lists by source."""
+    return jsonify({
+        "ok": True,
+        "data": {
+            "all":    TECH_SEARCH_TERMS,
+            "naukri": NAUKRI_SEARCH_TERMS,
+            "yc":     YC_SEARCH_TERMS,
+        },
+    }), 200
