@@ -5,10 +5,12 @@ import { Linkedin, Loader2, RefreshCw, Eye, Hash } from 'lucide-react';
 import toast from 'react-hot-toast';
 import CopyButton from '@/components/ui/CopyButton';
 import type { ResumeProfile } from '@/types';
+import { generateLinkedInPost } from '@/lib/api';
 import { DUMMY_LINKEDIN_POST } from '@/lib/dummy-data';
 
 interface Props {
   profile: ResumeProfile;
+  isDemo?: boolean;
 }
 
 const TONES = [
@@ -19,7 +21,7 @@ const TONES = [
 
 type Tone = typeof TONES[number]['id'];
 
-export default function LinkedInGenerator({ profile }: Props) {
+export default function LinkedInGenerator({ profile, isDemo }: Props) {
   const [tone, setTone] = useState<Tone>('authentic');
   const [post, setPost] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -27,10 +29,14 @@ export default function LinkedInGenerator({ profile }: Props) {
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      // In production: call /api/generate/linkedin-post
-      // const res = await axios.post('/api/generate/linkedin-post', { profile_summary, target_role, tone });
-      await new Promise((r) => setTimeout(r, 1600));
-      setPost(DUMMY_LINKEDIN_POST);
+      if (isDemo) {
+        await new Promise((r) => setTimeout(r, 1600));
+        setPost(DUMMY_LINKEDIN_POST);
+      } else {
+        const profileSummary = `${profile.name} is a ${profile.target_role} with ${profile.experience_years} years of experience. Skills include: ${profile.skills.join(', ')}. Education: ${profile.education}. Tone: ${tone}.`;
+        const data = await generateLinkedInPost(profileSummary, profile.target_role);
+        setPost(data.post);
+      }
       toast.success('LinkedIn post generated!');
     } catch {
       toast.error('Generation failed. Please try again.');

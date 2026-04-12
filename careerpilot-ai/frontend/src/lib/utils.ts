@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export function getScoreLabel(score: number): string {
   if (score >= 80) return 'Strong Match';
   if (score >= 65) return 'Good Match';
-  if (score >= 45) return 'Partial Match';
+  if (score >= 45) return 'So Close';
   return 'Weak Match';
 }
 
@@ -31,6 +31,13 @@ export function getScoreBadgeClass(score: number): string {
   if (score >= 65) return 'badge-yellow';
   if (score >= 45) return 'badge-yellow';
   return 'badge-red';
+}
+
+export function getScoreBg(score: number): string {
+  if (score >= 80) return 'border-emerald-500/30';
+  if (score >= 65) return 'border-yellow-500/30';
+  if (score >= 45) return 'border-orange-500/30';
+  return 'border-red-500/30';
 }
 
 export function getScoreRingColor(score: number): string {

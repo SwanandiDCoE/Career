@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ScoreRing from '@/components/ui/ScoreRing';
+import { generateStrategy } from '@/lib/api';
 import { DUMMY_STRATEGY } from '@/lib/dummy-data';
 import type {
   JobMatch, ApplyStrategy as ApplyStrategyType,
@@ -17,7 +18,7 @@ import type {
   ApplicationPriority,
 } from '@/types';
 
-interface Props { matches: JobMatch[] }
+interface Props { matches: JobMatch[]; resumeText?: string; isDemo?: boolean; }
 
 /* ── Config maps ──────────────────────────────────────────────── */
 const PRIORITY = {
@@ -71,7 +72,7 @@ const item = {
 
 /* ═══════════════════════════════════════════════════════════════ */
 
-export default function ApplyStrategy({ matches }: Props) {
+export default function ApplyStrategy({ matches, resumeText, isDemo }: Props) {
   const [selected, setSelected]   = useState<JobMatch>(matches[0]);
   const [strategy, setStrategy]   = useState<ApplyStrategyType | null>(null);
   const [loading, setLoading]     = useState(false);
@@ -81,12 +82,17 @@ export default function ApplyStrategy({ matches }: Props) {
     setLoading(true);
     setStrategy(null);
     try {
-      await new Promise(r => setTimeout(r, 2000));
-      setStrategy({
-        ...DUMMY_STRATEGY,
-        match_score:   selected.match_score,
-        match_summary: `Your profile is a ${selected.match_score >= 80 ? 'strong' : 'partial'} fit for ${selected.title} at ${selected.company}. ${DUMMY_STRATEGY.match_summary.split('.').slice(1).join('.').trim()}`,
-      });
+      if (resumeText) {
+        const result = await generateStrategy(resumeText, selected);
+        setStrategy(result);
+      } else {
+        await new Promise(r => setTimeout(r, 2000));
+        setStrategy({
+          ...DUMMY_STRATEGY,
+          match_score:   selected.match_score,
+          match_summary: `Your profile is a ${selected.match_score >= 80 ? 'strong' : 'partial'} fit for ${selected.title} at ${selected.company}. ${DUMMY_STRATEGY.match_summary.split('.').slice(1).join('.').trim()}`,
+        });
+      }
       toast.success('Strategy ready!');
     } catch {
       toast.error('Generation failed — try again.');
@@ -99,7 +105,7 @@ export default function ApplyStrategy({ matches }: Props) {
     <div className="flex flex-col gap-5">
 
       {/* ── Header ──────────────────────────────────────────── */}
-      <div className="p-5 rounded-2xl flex items-start gap-4"
+      <div className="p-4 sm:p-5 rounded-2xl flex items-start gap-3 sm:gap-4"
         style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.06) 100%)',
                  border: '1px solid rgba(99,102,241,0.18)' }}>
         <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
@@ -110,8 +116,10 @@ export default function ApplyStrategy({ matches }: Props) {
           <h2 className="text-white font-semibold text-[15px] flex items-center gap-2">
             Apply Strategy Engine
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(99,102,241,0.2)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.25)' }}>
-              AI
+              style={isDemo
+                ? { background: 'rgba(251,191,36,0.15)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.3)' }
+                : { background: 'rgba(99,102,241,0.2)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.25)' }}>
+              {isDemo ? 'Demo' : 'AI'}
             </span>
           </h2>
           <p className="text-sm mt-0.5 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
@@ -160,10 +168,10 @@ export default function ApplyStrategy({ matches }: Props) {
         whileTap={!loading ? { scale: 0.98 } : {}}
         className="btn-primary w-full py-3.5 text-[15px] rounded-xl disabled:opacity-50">
         {loading
-          ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating strategy...</>
+          ? <><Loader2 className="w-4 h-4 animate-spin" /> {isDemo ? 'Loading sample strategy…' : 'Generating strategy…'}</>
           : strategy
             ? <><Sparkles className="w-4 h-4" /> Regenerate for {selected.company}</>
-            : <><Zap className="w-4 h-4" /> Generate Strategy for {selected.company}</>
+            : <><Zap className="w-4 h-4" /> {isDemo ? 'See sample strategy for' : 'Generate Strategy for'} {selected.company}</>
         }
       </motion.button>
 
@@ -203,9 +211,9 @@ export default function ApplyStrategy({ matches }: Props) {
             <motion.div variants={item}
               className="rounded-2xl p-5 flex flex-col gap-4"
               style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
-              <div className="flex items-center gap-5">
-                <ScoreRing score={strategy.match_score} size={88} strokeWidth={6} />
-                <div>
+              <div className="flex items-center gap-4">
+                <ScoreRing score={strategy.match_score} size={72} strokeWidth={5} />
+                <div className="flex-1 min-w-0">
                   <p className="section-label">Match Analysis</p>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                     {strategy.match_summary}

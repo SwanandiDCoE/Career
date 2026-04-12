@@ -6,14 +6,16 @@ import toast from 'react-hot-toast';
 import CopyButton from '@/components/ui/CopyButton';
 import ScoreRing from '@/components/ui/ScoreRing';
 import type { JobMatch, ResumeProfile } from '@/types';
+import { generateColdEmail } from '@/lib/api';
 import { DUMMY_COLD_EMAIL } from '@/lib/dummy-data';
 
 interface Props {
   matches: JobMatch[];
   profile: ResumeProfile;
+  isDemo?: boolean;
 }
 
-export default function ColdEmailGenerator({ matches, profile }: Props) {
+export default function ColdEmailGenerator({ matches, profile, isDemo }: Props) {
   const [selectedJob, setSelectedJob] = useState<JobMatch>(matches[0]);
   const [email, setEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -21,11 +23,14 @@ export default function ColdEmailGenerator({ matches, profile }: Props) {
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      // In production: call /api/generate/cold-email
-      // const res = await axios.post('/api/generate/cold-email', { match: selectedJob, profile_summary: ... });
-      // setEmail(res.data.email);
-      await new Promise((r) => setTimeout(r, 1600));
-      setEmail(DUMMY_COLD_EMAIL);
+      if (isDemo) {
+        await new Promise((r) => setTimeout(r, 1600));
+        setEmail(DUMMY_COLD_EMAIL);
+      } else {
+        const profileSummary = `${profile.name}, ${profile.experience_years} years of experience as ${profile.target_role}. Skills: ${profile.skills.join(', ')}. Education: ${profile.education}.`;
+        const data = await generateColdEmail(selectedJob, profileSummary);
+        setEmail(data.email);
+      }
       toast.success('Cold email generated!');
     } catch {
       toast.error('Generation failed. Please try again.');

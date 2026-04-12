@@ -24,11 +24,15 @@ exports.generate = async (resumeText, job) => {
 
   logger.info(`strategy.generate → calling OpenAI for "${job.title}" at "${job.company}"`);
 
+  if (!job.description?.trim() || job.description.trim().length < 50) {
+    logger.warn(`strategy.generate → no meaningful job description for "${job.title}", using URL fallback`);
+  }
+
   const completion = await openai.chat.completions.create({
     model: MODEL,
     response_format: { type: 'json_object' },
     temperature: 0.3,   // Low — we want precise, not creative
-    max_tokens: 2000,   // Enough for full strategy, avoids runaway cost
+    max_tokens: 3000,   // Increased for full strategy output
     messages: [
       { role: 'system', content: prompts.STRATEGY_SYSTEM },
       { role: 'user',   content: prompts.strategyUser(resumeText, job) },

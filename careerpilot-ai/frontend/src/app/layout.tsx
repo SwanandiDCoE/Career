@@ -3,10 +3,11 @@ import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: "CareerPilot AI — Find Jobs You'll Actually Get",
+  title: "HireNext — Find Jobs You'll Actually Get",
   description:
-    'Upload your resume and get AI-ranked job matches, resume feedback, cold emails, and LinkedIn posts — in 30 seconds.',
-  keywords: ['job search', 'AI resume', 'job matching', 'career'],
+    'Upload your resume and get AI-ranked job matches, skill gap analysis, cold emails, and an apply strategy — in 30 seconds. No account needed.',
+  keywords: ['job search', 'AI resume', 'job matching', 'career', 'HireNext', 'skill gap analysis'],
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -15,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <Toaster
-          position="top-right"
+          position="top-center"
           toastOptions={{
             style: {
               background: '#1e293b',

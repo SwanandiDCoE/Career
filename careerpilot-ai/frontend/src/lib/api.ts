@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AnalysisResult, JobMatch } from '@/types';
+import type { AnalysisResult, JobMatch, ApplyStrategy } from '@/types';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000',
@@ -43,5 +43,22 @@ export async function generateColdEmail(match: JobMatch, profileSummary: string)
 // Generate LinkedIn post
 export async function generateLinkedInPost(profileSummary: string, targetRole: string) {
   const res = await api.post('/api/generate/linkedin-post', { profile_summary: profileSummary, target_role: targetRole });
+  return res.data;
+}
+
+// Generate apply strategy for a specific job
+export async function generateStrategy(resumeText: string, job: JobMatch): Promise<ApplyStrategy> {
+  const res = await api.post('/api/strategy', { resume_text: resumeText, job });
+  return unwrap<ApplyStrategy>(res);
+}
+
+// Create a shareable public profile card
+export async function shareProfile(
+  profile: import('@/types').ResumeProfile,
+  topMatch: JobMatch | null,
+  resumeScore: number,
+  topMatches?: JobMatch[],
+): Promise<{ slug: string; url: string }> {
+  const res = await api.post('/api/share', { profile, topMatch, resumeScore, topMatches: topMatches?.slice(0, 3) });
   return res.data;
 }

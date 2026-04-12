@@ -3,6 +3,7 @@ DataFrame → list[dict] cleaner.
 Normalizes JobSpy output to a consistent schema for the Node.js backend.
 """
 import pandas as pd
+from .extractor import extract
 
 
 def clean_jobs(df: pd.DataFrame) -> list[dict]:
@@ -26,7 +27,7 @@ def clean_jobs(df: pd.DataFrame) -> list[dict]:
         }
         # Only include jobs with a title and URL
         if job['title'] and job['job_url']:
-            jobs.append(job)
+            jobs.append(extract(job))
 
     return jobs
 

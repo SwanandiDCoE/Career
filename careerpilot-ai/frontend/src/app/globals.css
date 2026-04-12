@@ -34,7 +34,13 @@
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; font-feature-settings: "cv02","cv03","cv04","cv11"; }
+  html {
+    scroll-behavior: smooth;
+    font-feature-settings: "cv02","cv03","cv04","cv11";
+    /* Prevent font size inflation on mobile orientation change */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
 
   body {
     background-color: var(--surface);
@@ -43,7 +49,15 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Prevent horizontal overflow on mobile */
+    overflow-x: hidden;
   }
+
+  /* Remove tap highlight on mobile */
+  * { -webkit-tap-highlight-color: transparent; }
+
+  /* Ensure buttons and links have comfortable touch targets */
+  button, a, [role="button"] { touch-action: manipulation; }
 
   /* Selection */
   ::selection { background: rgba(99,102,241,0.3); color: #fff; }

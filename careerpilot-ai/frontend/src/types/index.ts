@@ -5,6 +5,9 @@ export interface ResumeProfile {
   experience_years: number;
   education: string;
   target_role: string;
+  seniority?: 'junior' | 'mid' | 'senior' | 'lead' | 'principal';
+  domain?: string;
+  work_preference?: 'remote' | 'hybrid' | 'onsite' | 'flexible';
 }
 
 export interface JobMatch {
@@ -16,13 +19,16 @@ export interface JobMatch {
   matched_skills: string[];
   missing_skills: string[];
   reason: string;
-  verdict: 'Strong Match' | 'Good Match' | 'Partial Match' | 'Weak Match';
+  verdict: 'Strong Match' | 'Good Match' | 'So Close' | 'Weak Match';
   // Extra fields from live DB jobs
+  description?: string;
   work_mode?: string;        // remote | hybrid | onsite
   salary_raw?: string;       // "25-40 LPA" as scraped
   company_domain?: string;   // fintech | SaaS | AI/ML
   source?: string;           // indeed | glassdoor
   date_posted?: string;
+  requirements?: string[];
+  company_size?: string;
 }
 
 export interface ResumeFeedback {
@@ -36,6 +42,7 @@ export interface AnalysisResult {
   profile: ResumeProfile;
   matches: JobMatch[];
   feedback: ResumeFeedback;
+  resume_text?: string;
 }
 
 // ── Apply Strategy Engine ─────────────────────────────────────────
