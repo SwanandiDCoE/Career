@@ -128,6 +128,37 @@ def insert_jobs_batch(jobs: list[dict]) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────
+# EXPIRE STALE JOBS
+# ─────────────────────────────────────────────────────────────────
+
+def expire_old_jobs(hours: int = 48) -> int:
+    """
+    Mark jobs not refreshed within `hours` as is_active=false.
+    Returns the number of rows updated.
+    """
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE jobs
+                SET is_active = false
+                WHERE is_active = true
+                  AND scraped_at < NOW() - (%(hours)s || ' hours')::interval
+                """,
+                {"hours": hours},
+            )
+            count = cur.rowcount
+            conn.commit()
+            return count
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        release_conn(conn)
+
+
+# ─────────────────────────────────────────────────────────────────
 # SEARCH / FILTER
 # ─────────────────────────────────────────────────────────────────
 
